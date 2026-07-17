@@ -47,6 +47,12 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Follow/Infrastructure/Persistence'
                 prefix: 'App\Follow\Infrastructure\Persistence'
                 alias: Follow
+            Shared:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Shared/Infrastructure/Outbox'
+                prefix: 'App\Shared\Infrastructure\Outbox'
+                alias: Shared
 
 when@test:
     doctrine:

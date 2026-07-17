@@ -59,6 +59,7 @@ services:
     App\Follow\Domain\Repository\FollowRepositoryInterface: '@App\Follow\Infrastructure\Persistence\DoctrineFollowRepository'
 
     App\User\Domain\Service\PasswordHasherInterface: '@App\User\Infrastructure\Service\SymfonyPasswordHasher'
+    App\Shared\Domain\EventPublisherInterface: '@App\Shared\Infrastructure\Outbox\DoctrineOutboxPublisher'
 
     # Share artprima's CollectorRegistry with tasko messenger metrics
     # so counters/gauges appear on /metrics/prometheus (Redis-backed).

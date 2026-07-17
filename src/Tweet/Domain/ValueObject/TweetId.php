@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace App\Tweet\Domain\ValueObject;
 
 use App\Shared\Domain\Exception\InvalidUuidException;
+use App\Shared\Domain\ValueObject\FromStringableValueObject;
 use App\Shared\Domain\ValueObject\Uuid;
 use Random\RandomException;
 
-final readonly class TweetId
+final readonly class TweetId implements FromStringableValueObject
 {
     private function __construct(
         private Uuid $uuid,

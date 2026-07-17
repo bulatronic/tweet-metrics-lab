@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\User\Domain\ValueObject;
 
+use App\Shared\Domain\ValueObject\FromStringableValueObject;
 use App\User\Domain\Exception\InvalidEmailException;
 
-final readonly class Email
+final readonly class Email implements FromStringableValueObject
 {
     /**
      * @throws InvalidEmailException

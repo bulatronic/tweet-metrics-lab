@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tweet\Domain\ValueObject;
 
+use App\Shared\Domain\ValueObject\FromStringableValueObject;
 use App\Tweet\Domain\Exception\TweetTextTooLongException;
 
-final readonly class TweetText
+final readonly class TweetText implements FromStringableValueObject
 {
     private const int MAX_LENGTH = 280;
 

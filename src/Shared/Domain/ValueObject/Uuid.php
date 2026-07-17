@@ -11,7 +11,7 @@ use Random\RandomException;
  * Immutable UUID wrapper (stdlib only — no Symfony/Ramsey).
  * New IDs are generated as UUID v7 (time-ordered).
  */
-final readonly class Uuid
+final readonly class Uuid implements FromStringableValueObject
 {
     /**
      * @throws InvalidUuidException

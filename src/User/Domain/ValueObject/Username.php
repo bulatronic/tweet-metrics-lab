@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\User\Domain\ValueObject;
 
+use App\Shared\Domain\ValueObject\FromStringableValueObject;
 use App\User\Domain\Exception\InvalidUsernameException;
 
-final readonly class Username
+final readonly class Username implements FromStringableValueObject
 {
     private const int MIN_LENGTH = 3;
     private const int MAX_LENGTH = 30;

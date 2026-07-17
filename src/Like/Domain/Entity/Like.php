@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Like\Domain\Entity;
 
 use App\Like\Domain\ValueObject\LikeId;
+use App\Shared\Domain\Exception\InvalidUuidException;
 use App\Tweet\Domain\ValueObject\TweetId;
 use App\User\Domain\ValueObject\UserId;
+use Random\RandomException;
 
 final readonly class Like
 {
@@ -18,6 +20,10 @@ final readonly class Like
     ) {
     }
 
+    /**
+     * @throws RandomException
+     * @throws InvalidUuidException
+     */
     public static function create(TweetId $tweetId, UserId $userId): self
     {
         return new self(

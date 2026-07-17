@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace App\Follow\Domain\ValueObject;
 
 use App\Shared\Domain\Exception\InvalidUuidException;
+use App\Shared\Domain\ValueObject\FromStringableValueObject;
 use App\Shared\Domain\ValueObject\Uuid;
 use Random\RandomException;
 
-final readonly class FollowId
+final readonly class FollowId implements FromStringableValueObject
 {
     private function __construct(
         private Uuid $uuid,
