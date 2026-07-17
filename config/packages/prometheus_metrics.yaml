@@ -1,0 +1,16 @@
+artprima_prometheus_metrics:
+    namespace: tweet_metrics_lab
+    storage:
+        type: redis
+        url: '%env(PROM_METRICS_DSN)%'
+
+    ignored_routes:
+        - prometheus_bundle_prometheus
+        - _wdt
+
+    # Keep promphp default metrics (php_info, etc.) for /metrics/prometheus
+    disable_default_promphp_metrics: false
+
+when@test:
+    artprima_prometheus_metrics:
+        storage: in_memory

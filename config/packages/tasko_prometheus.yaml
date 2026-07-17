@@ -1,0 +1,25 @@
+# Messenger metrics (tasko-products/symfony-prometheus-exporter).
+# Middleware is registered on the default bus in messenger.yaml.
+tasko_products_symfony_prometheus_exporter:
+    middlewares:
+        event_middleware:
+            namespace: middleware
+            metric_name: message
+            help_text: 'Executed Messages'
+            labels:
+                bus: bus
+                message: message
+                label: label
+            error_help_text: 'Failed Messages'
+            error_labels:
+                bus: bus
+                message: message
+                label: label
+
+    event_subscribers:
+        active_workers:
+            enabled: true
+        messages_in_transport:
+            enabled: true
+        messages_in_process:
+            enabled: false

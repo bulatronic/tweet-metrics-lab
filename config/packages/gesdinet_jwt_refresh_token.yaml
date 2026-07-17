@@ -1,0 +1,4 @@
+gesdinet_jwt_refresh_token:
+    refresh_token_class: App\User\Infrastructure\Persistence\DoctrineRefreshToken
+    ttl: 2592000 # 30 days
+    single_use: true

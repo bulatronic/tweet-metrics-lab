@@ -1,4 +1,17 @@
 {
+    "artprima/prometheus-metrics-bundle": {
+        "version": "1.22",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "main",
+            "version": "1.21",
+            "ref": "744712c8112617ad624db495c3dd45336d737377"
+        },
+        "files": [
+            "config/packages/prometheus_metrics.yaml",
+            "config/routes/metrics.yaml"
+        ]
+    },
     "bulatronic/api-kit": {
         "version": "1.3",
         "recipe": {
@@ -83,6 +96,20 @@
             ".php-cs-fixer.dist.php"
         ]
     },
+    "gesdinet/jwt-refresh-token-bundle": {
+        "version": "2.0",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "main",
+            "version": "1.0",
+            "ref": "2390b4ed5c195e0b3f6dea45221f3b7c0af523a0"
+        },
+        "files": [
+            "config/packages/gesdinet_jwt_refresh_token.yaml",
+            "config/routes/gesdinet_jwt_refresh_token.yaml",
+            "src/Entity/RefreshToken.php"
+        ]
+    },
     "lexik/jwt-authentication-bundle": {
         "version": "3.2",
         "recipe": {
@@ -106,6 +133,18 @@
         "files": [
             "config/packages/nelmio_api_doc.yaml",
             "config/routes/nelmio_api_doc.yaml"
+        ]
+    },
+    "php-http/discovery": {
+        "version": "1.20",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "1.18",
+            "ref": "f45b5dd173a27873ab19f5e3180b2f661c21de02"
+        },
+        "files": [
+            "config/packages/http_discovery.yaml"
         ]
     },
     "phpstan/phpstan": {
@@ -263,6 +302,9 @@
         "files": [
             "config/packages/validator.yaml"
         ]
+    },
+    "tasko-products/symfony-prometheus-exporter": {
+        "version": "3.0.0"
     },
     "twig/extra-bundle": {
         "version": "v3.24.0"

@@ -18,6 +18,14 @@ services:
     # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+            - '../src/*/Domain/Entity/'
+            - '../src/*/Infrastructure/Persistence/'
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+    # Share artprima's CollectorRegistry with tasko messenger metrics
+    # so counters/gauges appear on /metrics/prometheus (Redis-backed).
+    Prometheus\CollectorRegistry: '@prometheus_metrics_bundle.collector_registry'
+    Prometheus\RegistryInterface: '@prometheus_metrics_bundle.collector_registry'

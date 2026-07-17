@@ -1250,6 +1250,13 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *             always_remember_me?: bool|Param, // Default: false
  *             remember_me_parameter?: scalar|Param|null, // Default: "_remember_me"
  *         },
+ *         refresh_jwt?: array{
+ *             check_path?: scalar|Param|null, // Default: "/login_check"
+ *             provider?: scalar|Param|null,
+ *             success_handler?: scalar|Param|null,
+ *             failure_handler?: scalar|Param|null,
+ *             invalidate_token_on_logout?: bool|Param, // When enabled, the refresh token will be invalided on logout. // Default: true
+ *         },
  *     }>,
  *     access_control?: list<array{ // Default: []
  *         request_matcher?: scalar|Param|null, // Default: null
@@ -1450,6 +1457,132 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         ...<string, mixed>
  *     },
  * }
+ * @psalm-type ArtprimaPrometheusMetricsConfig = array{
+ *     namespace?: scalar|Param|null,
+ *     type?: scalar|Param|null, // Deprecated: The type config parameter was deprecated in 1.14 and will be dropped in 2.0. // Default: "in_memory"
+ *     redis?: array{ // Deprecated: The redis config parameter was deprecated in 1.14 and will be dropped in 2.0.
+ *         host?: scalar|Param|null,
+ *         port?: int|Param, // Default: 6379
+ *         timeout?: float|Param,
+ *         read_timeout?: float|Param,
+ *         persistent_connections?: bool|Param,
+ *         password?: scalar|Param|null,
+ *         database?: int|Param,
+ *         prefix?: scalar|Param|null,
+ *     },
+ *     storage?: string|array{
+ *         url?: scalar|Param|null, // DSN of the storage. All parsed values will override explicitly set parameters. Ex: redis://127.0.0.1?timeout=0.1
+ *         type?: scalar|Param|null, // The type of storage provide by factories. Default factories are ["in_memory","apcu","apcng","redis"]
+ *         host?: scalar|Param|null, // Use by some factory like redis. Default value should be managed by the factory at runtime.
+ *         port?: int|Param, // Use by some factory like redis. Default value should be managed by the factory at runtime.
+ *         timeout?: float|Param, // Connection timeout used by some factory like redis.
+ *         read_timeout?: float|Param,
+ *         persistent_connections?: bool|Param,
+ *         password?: scalar|Param|null,
+ *         database?: int|Param,
+ *         prefix?: scalar|Param|null, // Internal prefix used by the storage. Available for redis and apcu type.
+ *         options?: array<string, mixed>,
+ *     },
+ *     ignored_routes?: list<scalar|Param|null>,
+ *     disable_default_metrics?: bool|Param, // Default: false
+ *     disable_default_promphp_metrics?: bool|Param, // Default: false
+ *     enable_console_metrics?: bool|Param, // Default: false
+ *     labels?: list<array{ // Default: []
+ *         name?: scalar|Param|null, // Name of the label that will appear in the metric
+ *         type?: "request_attribute"|"request_header"|Param, // Type of the label value. Where the value will be collected: in the request attribute or in the request header
+ *         value?: scalar|Param|null, // Name of the attribute or header in the Request
+ *     }>,
+ *     buckets?: list<float|Param>,
+ * }
+ * @psalm-type GesdinetJwtRefreshTokenConfig = array{
+ *     ttl?: int|Param, // The default TTL for all authenticators. // Default: 2592000
+ *     ttl_update?: bool|Param, // The default update TTL flag for all authenticators. // Default: false
+ *     manager_type?: scalar|Param|null, // Set the type of object manager to use (default: orm) // Default: "orm"
+ *     refresh_token_class?: scalar|Param|null, // Set the refresh token class to use
+ *     object_manager?: scalar|Param|null, // Set the object manager to use (default: doctrine.orm.entity_manager) // Default: null
+ *     single_use?: scalar|Param|null, // When true, generate a new refresh token on consumption (deleting the old one) // Default: false
+ *     token_parameter_name?: scalar|Param|null, // The default request parameter name containing the refresh token for all authenticators. // Default: "refresh_token"
+ *     cookie?: bool|array{
+ *         enabled?: bool|Param, // Default: false
+ *         same_site?: "none"|"lax"|"strict"|Param, // Default: "lax"
+ *         path?: scalar|Param|null, // Default: "/"
+ *         domain?: scalar|Param|null, // Default: null
+ *         http_only?: scalar|Param|null, // Default: true
+ *         secure?: scalar|Param|null, // Default: true
+ *         partitioned?: scalar|Param|null, // Default: false
+ *         remove_token_from_body?: scalar|Param|null, // Default: true
+ *     },
+ *     return_expiration?: scalar|Param|null, // When true, the response will include the token expiration timestamp // Default: false
+ *     return_expiration_parameter_name?: scalar|Param|null, // The default response parameter name containing the refresh token expiration timestamp // Default: "refresh_token_expiration"
+ *     default_invalid_batch_size?: int|Param, // The default batch size when clearing invalid tokens // Default: 1000
+ * }
+ * @psalm-type TaskoProductsSymfonyPrometheusExporterConfig = array{
+ *     event_subscribers?: array{
+ *         active_workers?: array{
+ *             enabled?: bool|Param,
+ *             namespace?: scalar|Param|null,
+ *             metric_name?: scalar|Param|null,
+ *             help_text?: scalar|Param|null,
+ *             labels?: array{
+ *                 queue_names?: scalar|Param|null,
+ *                 transport_names?: scalar|Param|null,
+ *             },
+ *         },
+ *         messages_in_process?: array{
+ *             enabled?: bool|Param,
+ *             namespace?: scalar|Param|null,
+ *             metric_name?: scalar|Param|null,
+ *             help_text?: scalar|Param|null,
+ *             labels?: array{
+ *                 message_path?: scalar|Param|null,
+ *                 message_class?: scalar|Param|null,
+ *                 receiver?: scalar|Param|null,
+ *                 bus?: scalar|Param|null,
+ *             },
+ *         },
+ *         messages_in_transport?: array{
+ *             enabled?: bool|Param,
+ *             namespace?: scalar|Param|null,
+ *             metric_name?: scalar|Param|null,
+ *             help_text?: scalar|Param|null,
+ *             labels?: array{
+ *                 message_path?: scalar|Param|null,
+ *                 message_class?: scalar|Param|null,
+ *                 receiver?: scalar|Param|null,
+ *                 bus?: scalar|Param|null,
+ *             },
+ *         },
+ *     },
+ *     middlewares?: array{
+ *         event_middleware?: array{
+ *             namespace?: scalar|Param|null,
+ *             metric_name?: scalar|Param|null,
+ *             help_text?: scalar|Param|null,
+ *             labels?: array{
+ *                 bus?: scalar|Param|null,
+ *                 message?: scalar|Param|null,
+ *                 label?: scalar|Param|null,
+ *             },
+ *             error_help_text?: scalar|Param|null,
+ *             error_labels?: array{
+ *                 bus?: scalar|Param|null,
+ *                 message?: scalar|Param|null,
+ *                 label?: scalar|Param|null,
+ *             },
+ *         },
+ *         retry_event_middleware?: array{
+ *             namespace?: scalar|Param|null,
+ *             metric_name?: scalar|Param|null,
+ *             help_text?: scalar|Param|null,
+ *             labels?: array{
+ *                 bus?: scalar|Param|null,
+ *                 message?: scalar|Param|null,
+ *                 label?: scalar|Param|null,
+ *                 retry?: scalar|Param|null,
+ *             },
+ *         },
+ *     },
+ * }
  * @psalm-type ConfigType = array{
  *     imports?: ImportsConfig,
  *     parameters?: ParametersConfig,
@@ -1463,6 +1596,9 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     api_kit?: ApiKitConfig,
  *     twig?: TwigConfig,
  *     twig_extra?: TwigExtraConfig,
+ *     artprima_prometheus_metrics?: ArtprimaPrometheusMetricsConfig,
+ *     gesdinet_jwt_refresh_token?: GesdinetJwtRefreshTokenConfig,
+ *     tasko_products_symfony_prometheus_exporter?: TaskoProductsSymfonyPrometheusExporterConfig,
  *     "when@dev"?: array{
  *         imports?: ImportsConfig,
  *         parameters?: ParametersConfig,
@@ -1477,6 +1613,9 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         api_kit?: ApiKitConfig,
  *         twig?: TwigConfig,
  *         twig_extra?: TwigExtraConfig,
+ *         artprima_prometheus_metrics?: ArtprimaPrometheusMetricsConfig,
+ *         gesdinet_jwt_refresh_token?: GesdinetJwtRefreshTokenConfig,
+ *         tasko_products_symfony_prometheus_exporter?: TaskoProductsSymfonyPrometheusExporterConfig,
  *     },
  *     "when@prod"?: array{
  *         imports?: ImportsConfig,
@@ -1491,6 +1630,9 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         api_kit?: ApiKitConfig,
  *         twig?: TwigConfig,
  *         twig_extra?: TwigExtraConfig,
+ *         artprima_prometheus_metrics?: ArtprimaPrometheusMetricsConfig,
+ *         gesdinet_jwt_refresh_token?: GesdinetJwtRefreshTokenConfig,
+ *         tasko_products_symfony_prometheus_exporter?: TaskoProductsSymfonyPrometheusExporterConfig,
  *     },
  *     "when@test"?: array{
  *         imports?: ImportsConfig,
@@ -1505,6 +1647,9 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         api_kit?: ApiKitConfig,
  *         twig?: TwigConfig,
  *         twig_extra?: TwigExtraConfig,
+ *         artprima_prometheus_metrics?: ArtprimaPrometheusMetricsConfig,
+ *         gesdinet_jwt_refresh_token?: GesdinetJwtRefreshTokenConfig,
+ *         tasko_products_symfony_prometheus_exporter?: TaskoProductsSymfonyPrometheusExporterConfig,
  *     },
  *     ...<string, ExtensionType|array{ // extra keys must follow the when@%env% pattern or match an extension alias
  *         imports?: ImportsConfig,

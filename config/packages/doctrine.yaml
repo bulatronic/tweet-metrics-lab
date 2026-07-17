@@ -14,12 +14,19 @@ doctrine:
             Doctrine\DBAL\Platforms\PostgreSQLPlatform: identity
         auto_mapping: true
         mappings:
-            App:
+            # Mapped superclass for refresh tokens (gesdinet/jwt-refresh-token-bundle)
+            GesdinetJWTRefreshTokenBundle:
+                type: xml
+                is_bundle: false
+                dir: '%kernel.project_dir%/vendor/gesdinet/jwt-refresh-token-bundle/config/doctrine'
+                prefix: 'Gesdinet\JWTRefreshTokenBundle\Entity'
+                alias: GesdinetJWTRefreshTokenBundle
+            User:
                 type: attribute
                 is_bundle: false
-                dir: '%kernel.project_dir%/src/Entity'
-                prefix: 'App\Entity'
-                alias: App
+                dir: '%kernel.project_dir%/src/User/Infrastructure/Persistence'
+                prefix: 'App\User\Infrastructure\Persistence'
+                alias: User
 
 when@test:
     doctrine:
