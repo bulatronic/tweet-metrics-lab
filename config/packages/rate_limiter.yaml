@@ -1,0 +1,12 @@
+framework:
+    rate_limiter:
+        login_ip:
+            policy: fixed_window
+            limit: 5
+            interval: '1 minute'
+            cache_pool: cache.rate_limiter
+        create_tweet:
+            policy: fixed_window
+            limit: 30
+            interval: '1 minute'
+            cache_pool: cache.rate_limiter

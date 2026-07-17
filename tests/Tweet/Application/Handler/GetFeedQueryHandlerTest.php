@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Tweet\Application\Handler;
 
 use App\Tweet\Application\DTO\FeedPageDTO;
+use App\Tweet\Application\FeedCacheMetricsInterface;
 use App\Tweet\Application\Handler\GetFeedQueryHandler;
 use App\Tweet\Application\Query\GetFeedQuery;
 use Doctrine\DBAL\Connection;
@@ -18,13 +19,19 @@ final class GetFeedQueryHandlerTest extends TestCase
 {
     private Connection&MockObject $connection;
     private CacheInterface&MockObject $feedCache;
+    private FeedCacheMetricsInterface&MockObject $feedCacheMetrics;
     private GetFeedQueryHandler $handler;
 
     protected function setUp(): void
     {
         $this->connection = $this->createMock(Connection::class);
         $this->feedCache = $this->createMock(CacheInterface::class);
-        $this->handler = new GetFeedQueryHandler($this->connection, $this->feedCache);
+        $this->feedCacheMetrics = $this->createMock(FeedCacheMetricsInterface::class);
+        $this->handler = new GetFeedQueryHandler(
+            $this->connection,
+            $this->feedCache,
+            $this->feedCacheMetrics,
+        );
     }
 
     /**
@@ -33,6 +40,9 @@ final class GetFeedQueryHandlerTest extends TestCase
     public function testReadsFeedViaDbalAndCachesResult(): void
     {
         $createdAt = new \DateTimeImmutable('2026-07-17T12:00:00+00:00');
+
+        $this->feedCacheMetrics->expects($this->once())->method('incrementMisses');
+        $this->feedCacheMetrics->expects($this->never())->method('incrementHits');
 
         $this->feedCache
             ->expects($this->once())
@@ -74,6 +84,8 @@ final class GetFeedQueryHandlerTest extends TestCase
      */
     public function testBuildsNextCursorWhenPageIsFull(): void
     {
+        $this->feedCacheMetrics->expects($this->once())->method('incrementMisses');
+
         $this->feedCache
             ->expects($this->once())
             ->method('get')
@@ -105,5 +117,25 @@ final class GetFeedQueryHandlerTest extends TestCase
         $decoded = json_decode(base64_decode($page->nextCursor, true) ?: '', true);
         self::assertIsArray($decoded);
         self::assertSame('01900000-0000-7000-8000-000000000001', $decoded['id']);
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     */
+    public function testIncrementsCacheHitMetricWhenCached(): void
+    {
+        $cached = new FeedPageDTO([], null);
+
+        $this->feedCacheMetrics->expects($this->once())->method('incrementHits');
+        $this->feedCacheMetrics->expects($this->never())->method('incrementMisses');
+
+        $this->feedCache
+            ->expects($this->once())
+            ->method('get')
+            ->willReturn($cached);
+
+        $this->connection->expects($this->never())->method('fetchAllAssociative');
+
+        self::assertSame($cached, ($this->handler)(new GetFeedQuery()));
     }
 }

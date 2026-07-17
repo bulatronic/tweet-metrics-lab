@@ -12,7 +12,7 @@ use Symfony\Component\Security\Http\Event\LogoutEvent;
 
 /**
  * Deletes all refresh tokens for the logging-out user.
- * Access-token jti blacklist is handled by Lexik BlockJWTListener when blocklist_token is enabled.
+ * Access-token jti blacklist is handled in LogoutController via JwtTokenBlacklist.
  */
 final readonly class InvalidateRefreshTokensOnLogoutSubscriber implements EventSubscriberInterface
 {

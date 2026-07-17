@@ -15,6 +15,15 @@ services:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 
+    # PhpRedis connection to the same redis service as redis-exporter (CACHE_DSN → redis:6379).
+    app.redis:
+        class: Redis
+        factory: ['Symfony\Component\Cache\Adapter\RedisAdapter', 'createConnection']
+        arguments:
+            - '%env(CACHE_DSN)%'
+
+    Redis: '@app.redis'
+
     App\User\:
         resource: '../src/User/'
         exclude:
@@ -67,6 +76,9 @@ services:
 
     App\User\Domain\Service\PasswordHasherInterface: '@App\User\Infrastructure\Service\SymfonyPasswordHasher'
     App\Shared\Domain\EventPublisherInterface: '@App\Shared\Infrastructure\Outbox\DoctrineOutboxPublisher'
+    App\Tweet\Application\FeedCacheMetricsInterface: '@App\Shared\Infrastructure\Metrics\FeedMetrics'
+
+    Lexik\Bundle\JWTAuthenticationBundle\TokenExtractor\TokenExtractorInterface: '@lexik_jwt_authentication.extractor.chain_extractor'
 
     # Share artprima's CollectorRegistry with tasko messenger metrics
     # so counters/gauges appear on /metrics/prometheus (Redis-backed).

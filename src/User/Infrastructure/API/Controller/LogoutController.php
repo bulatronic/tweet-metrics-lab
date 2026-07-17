@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace App\User\Infrastructure\API\Controller;
 
 use ApiKit\Controller\AbstractApiController;
+use App\User\Infrastructure\Security\JwtTokenBlacklist;
+use Lexik\Bundle\JWTAuthenticationBundle\Exception\JWTDecodeFailureException;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+use Lexik\Bundle\JWTAuthenticationBundle\TokenExtractor\TokenExtractorInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,20 +17,37 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Http\Event\LogoutEvent;
 
 /**
- * Triggers Symfony LogoutEvent so Lexik blacklists access-token jti
- * and refresh tokens are removed from DB.
+ * Blacklists access-token jti in Redis (TTL = remaining lifetime) and invalidates refresh tokens.
  */
 final class LogoutController extends AbstractApiController
 {
     public function __construct(
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly TokenStorageInterface $tokenStorage,
+        private readonly TokenExtractorInterface $tokenExtractor,
+        private readonly JWTTokenManagerInterface $jwtManager,
+        private readonly JwtTokenBlacklist $jwtBlacklist,
     ) {
     }
 
     #[Route('/api/logout', name: 'api_logout', methods: ['POST'])]
     public function __invoke(Request $request): Response
     {
+        $rawToken = $this->tokenExtractor->extract($request);
+        if (false !== $rawToken && '' !== $rawToken) {
+            try {
+                $payload = $this->jwtManager->parse($rawToken);
+                $jti = $payload['jti'] ?? null;
+                $exp = $payload['exp'] ?? null;
+                if (\is_string($jti) && '' !== $jti && (\is_int($exp) || \is_float($exp) || \is_string($exp))) {
+                    $ttl = (int) $exp - time();
+                    $this->jwtBlacklist->add($jti, $ttl);
+                }
+            } catch (JWTDecodeFailureException) {
+                // Token already invalid — nothing to blacklist.
+            }
+        }
+
         $this->eventDispatcher->dispatch(new LogoutEvent($request, $this->tokenStorage->getToken()));
         $this->tokenStorage->setToken(null);
 

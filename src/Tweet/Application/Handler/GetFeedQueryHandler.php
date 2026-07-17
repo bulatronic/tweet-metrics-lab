@@ -6,6 +6,7 @@ namespace App\Tweet\Application\Handler;
 
 use App\Tweet\Application\DTO\FeedItemDTO;
 use App\Tweet\Application\DTO\FeedPageDTO;
+use App\Tweet\Application\FeedCacheMetricsInterface;
 use App\Tweet\Application\Query\GetFeedQuery;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
@@ -30,6 +31,7 @@ final readonly class GetFeedQueryHandler
         private Connection $connection,
         #[Autowire(service: 'cache.feed')]
         private CacheInterface $feedCache,
+        private FeedCacheMetricsInterface $feedCacheMetrics,
     ) {
     }
 
@@ -42,12 +44,21 @@ final readonly class GetFeedQueryHandler
         $cursor = $query->cursor;
         $cacheKey = sprintf('feed_%s_%d', $cursor ?? 'start', $limit);
 
+        $cacheHit = true;
+
         /** @var FeedPageDTO $page */
-        $page = $this->feedCache->get($cacheKey, function (ItemInterface $item) use ($limit, $cursor): FeedPageDTO {
+        $page = $this->feedCache->get($cacheKey, function (ItemInterface $item) use ($limit, $cursor, &$cacheHit): FeedPageDTO {
+            $cacheHit = false;
             $item->expiresAfter(self::CACHE_TTL_SECONDS);
 
             return $this->fetchPage($limit, $cursor);
         });
+
+        if ($cacheHit) {
+            $this->feedCacheMetrics->incrementHits();
+        } else {
+            $this->feedCacheMetrics->incrementMisses();
+        }
 
         return $page;
     }

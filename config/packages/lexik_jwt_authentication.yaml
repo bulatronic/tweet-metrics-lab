@@ -5,6 +5,6 @@ lexik_jwt_authentication:
     token_ttl: 900 # 15 minutes
     # Must match security provider property (email), not DoctrineUser::getUsername().
     user_id_claim: email
+    # Custom Redis jti blacklist + jwt_decoded listener (see User/Infrastructure).
     blocklist_token:
-        enabled: true
-        cache: cache.jwt_blocklist
+        enabled: false
