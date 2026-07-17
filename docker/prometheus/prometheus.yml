@@ -1,0 +1,35 @@
+global:
+    scrape_interval: 5s
+    evaluation_interval: 5s
+
+scrape_configs:
+    -   job_name: frankenphp
+        metrics_path: /metrics/prometheus
+        static_configs:
+            -   targets:
+                    - frankenphp:80
+
+    -   job_name: postgres-exporter
+        static_configs:
+            -   targets:
+                    - postgres-exporter:9187
+
+    -   job_name: redis-exporter
+        static_configs:
+            -   targets:
+                    - redis-exporter:9121
+
+    -   job_name: rabbitmq
+        static_configs:
+            -   targets:
+                    - rabbitmq:15692
+
+    -   job_name: elasticsearch-exporter
+        static_configs:
+            -   targets:
+                    - elasticsearch-exporter:9114
+
+    -   job_name: node-exporter
+        static_configs:
+            -   targets:
+                    - node-exporter:9100
