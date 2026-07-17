@@ -9,6 +9,10 @@ framework:
                 default_lifetime: 30
             cache.rate_limiter:
                 adapter: cache.app
+            cache.jwt_blacklist:
+                adapter: cache.app
+            cache.active_users:
+                adapter: cache.app
 
 when@test:
     framework:
@@ -19,4 +23,8 @@ when@test:
                     adapter: cache.app
                     default_lifetime: 30
                 cache.rate_limiter:
+                    adapter: cache.app
+                cache.jwt_blacklist:
+                    adapter: cache.app
+                cache.active_users:
                     adapter: cache.app

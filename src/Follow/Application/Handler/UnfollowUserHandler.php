@@ -10,6 +10,7 @@ use App\Follow\Domain\Exception\FollowNotFoundException;
 use App\Follow\Domain\Repository\FollowRepositoryInterface;
 use App\Shared\Domain\EventPublisherInterface;
 use App\Shared\Domain\Exception\InvalidUuidException;
+use App\Shared\Domain\MetricsRegistryInterface;
 use App\User\Domain\ValueObject\UserId;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -19,6 +20,7 @@ final readonly class UnfollowUserHandler
     public function __construct(
         private FollowRepositoryInterface $followRepository,
         private EventPublisherInterface $eventPublisher,
+        private MetricsRegistryInterface $metricsRegistry,
     ) {
     }
 
@@ -39,5 +41,6 @@ final readonly class UnfollowUserHandler
         $occurredAt = new \DateTimeImmutable();
         $this->followRepository->remove($follow);
         $this->eventPublisher->publish(new UserWasUnfollowed($followerId, $followeeId, $occurredAt));
+        $this->metricsRegistry->incrementUnfollows();
     }
 }

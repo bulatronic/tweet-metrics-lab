@@ -9,6 +9,7 @@ use App\Like\Domain\Exception\LikeNotFoundException;
 use App\Like\Domain\Repository\LikeRepositoryInterface;
 use App\Shared\Domain\EventPublisherInterface;
 use App\Shared\Domain\Exception\InvalidUuidException;
+use App\Shared\Domain\MetricsRegistryInterface;
 use App\Tweet\Domain\Event\TweetWasUnliked;
 use App\Tweet\Domain\ValueObject\TweetId;
 use App\User\Domain\ValueObject\UserId;
@@ -20,6 +21,7 @@ final readonly class UnlikeTweetHandler
     public function __construct(
         private LikeRepositoryInterface $likeRepository,
         private EventPublisherInterface $eventPublisher,
+        private MetricsRegistryInterface $metricsRegistry,
     ) {
     }
 
@@ -40,5 +42,6 @@ final readonly class UnlikeTweetHandler
         $occurredAt = new \DateTimeImmutable();
         $this->likeRepository->remove($like);
         $this->eventPublisher->publish(new TweetWasUnliked($tweetId, $userId, $occurredAt));
+        $this->metricsRegistry->incrementUnlikes();
     }
 }

@@ -12,6 +12,7 @@ use App\Follow\Domain\Exception\FollowAlreadyExistsException;
 use App\Follow\Domain\Repository\FollowRepositoryInterface;
 use App\Shared\Domain\EventPublisherInterface;
 use App\Shared\Domain\Exception\InvalidUuidException;
+use App\Shared\Domain\MetricsRegistryInterface;
 use App\User\Domain\Exception\UserNotFoundException;
 use App\User\Domain\Repository\UserRepositoryInterface;
 use App\User\Domain\ValueObject\UserId;
@@ -25,6 +26,7 @@ final readonly class FollowUserHandler
         private FollowRepositoryInterface $followRepository,
         private UserRepositoryInterface $userRepository,
         private EventPublisherInterface $eventPublisher,
+        private MetricsRegistryInterface $metricsRegistry,
     ) {
     }
 
@@ -60,5 +62,6 @@ final readonly class FollowUserHandler
             $follow->followeeId(),
             $follow->createdAt(),
         ));
+        $this->metricsRegistry->incrementFollows();
     }
 }

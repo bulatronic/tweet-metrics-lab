@@ -10,13 +10,21 @@ use App\Like\Domain\Entity\Like;
 use App\Like\Domain\Exception\LikeNotFoundException;
 use App\Like\Domain\Repository\LikeRepositoryInterface;
 use App\Shared\Domain\EventPublisherInterface;
+use App\Shared\Domain\Exception\InvalidUuidException;
+use App\Shared\Domain\MetricsRegistryInterface;
 use App\Tweet\Domain\Event\TweetWasUnliked;
 use App\Tweet\Domain\ValueObject\TweetId;
 use App\User\Domain\ValueObject\UserId;
 use PHPUnit\Framework\TestCase;
+use Random\RandomException;
 
 final class UnlikeTweetHandlerTest extends TestCase
 {
+    /**
+     * @throws RandomException
+     * @throws InvalidUuidException
+     * @throws LikeNotFoundException
+     */
     public function testRemovesLikeAndPublishesUnlikedEvent(): void
     {
         $tweetId = TweetId::generate();
@@ -40,7 +48,10 @@ final class UnlikeTweetHandlerTest extends TestCase
                     && $event->userId->equals($userId);
             }));
 
-        $handler = new UnlikeTweetHandler($likeRepository, $eventPublisher);
+        $metrics = $this->createMock(MetricsRegistryInterface::class);
+        $metrics->expects($this->once())->method('incrementUnlikes');
+
+        $handler = new UnlikeTweetHandler($likeRepository, $eventPublisher, $metrics);
 
         $handler(new UnlikeTweetCommand(
             $tweetId->toString(),
@@ -48,6 +59,10 @@ final class UnlikeTweetHandlerTest extends TestCase
         ));
     }
 
+    /**
+     * @throws RandomException
+     * @throws InvalidUuidException
+     */
     public function testThrowsWhenLikeMissing(): void
     {
         $likeRepository = $this->createStub(LikeRepositoryInterface::class);
@@ -56,6 +71,7 @@ final class UnlikeTweetHandlerTest extends TestCase
         $handler = new UnlikeTweetHandler(
             $likeRepository,
             $this->createStub(EventPublisherInterface::class),
+            $this->createStub(MetricsRegistryInterface::class),
         );
 
         $this->expectException(LikeNotFoundException::class);

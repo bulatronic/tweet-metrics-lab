@@ -10,6 +10,7 @@ use App\Like\Domain\Exception\LikeAlreadyExistsException;
 use App\Like\Domain\Repository\LikeRepositoryInterface;
 use App\Shared\Domain\EventPublisherInterface;
 use App\Shared\Domain\Exception\InvalidUuidException;
+use App\Shared\Domain\MetricsRegistryInterface;
 use App\Tweet\Domain\Event\TweetWasLiked;
 use App\Tweet\Domain\Exception\TweetNotFoundException;
 use App\Tweet\Domain\Repository\TweetRepositoryInterface;
@@ -28,6 +29,7 @@ final readonly class LikeTweetHandler
         private TweetRepositoryInterface $tweetRepository,
         private UserRepositoryInterface $userRepository,
         private EventPublisherInterface $eventPublisher,
+        private MetricsRegistryInterface $metricsRegistry,
     ) {
     }
 
@@ -63,5 +65,6 @@ final readonly class LikeTweetHandler
             $userId,
             $like->createdAt(),
         ));
+        $this->metricsRegistry->incrementLikes();
     }
 }

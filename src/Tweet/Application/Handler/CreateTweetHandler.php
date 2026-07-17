@@ -6,6 +6,7 @@ namespace App\Tweet\Application\Handler;
 
 use App\Shared\Domain\EventPublisherInterface;
 use App\Shared\Domain\Exception\InvalidUuidException;
+use App\Shared\Domain\MetricsRegistryInterface;
 use App\Tweet\Application\Command\CreateTweetCommand;
 use App\Tweet\Domain\Entity\Tweet;
 use App\Tweet\Domain\Event\TweetWasCreated;
@@ -25,6 +26,7 @@ final readonly class CreateTweetHandler
         private TweetRepositoryInterface $tweetRepository,
         private UserRepositoryInterface $userRepository,
         private EventPublisherInterface $eventPublisher,
+        private MetricsRegistryInterface $metricsRegistry,
     ) {
     }
 
@@ -50,6 +52,7 @@ final readonly class CreateTweetHandler
             $tweet->authorId(),
             $tweet->createdAt(),
         ));
+        $this->metricsRegistry->incrementTweetsCreated();
 
         return $tweet->id()->toString();
     }

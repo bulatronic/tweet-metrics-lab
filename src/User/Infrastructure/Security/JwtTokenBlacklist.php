@@ -4,16 +4,19 @@ declare(strict_types=1);
 
 namespace App\User\Infrastructure\Security;
 
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Contracts\Cache\CacheInterface;
+
 /**
- * Stores blacklisted JWT jti values in Redis with TTL = remaining token lifetime.
- * Uses one Redis key per jti (SET + EXPIRE): Redis SET members cannot have individual TTLs.
+ * Stores blacklisted JWT jti values in Symfony Cache (RedisAdapter) with TTL = remaining token lifetime.
  */
 final readonly class JwtTokenBlacklist
 {
-    private const string KEY_PREFIX = 'jwt_blacklist:';
+    private const string KEY_PREFIX = 'jwt_blacklist_';
 
     public function __construct(
-        private \Redis $redis,
+        #[Autowire(service: 'cache.jwt_blacklist')]
+        private CacheInterface $cache,
     ) {
     }
 
@@ -23,7 +26,10 @@ final readonly class JwtTokenBlacklist
             return;
         }
 
-        $this->redis->setex(self::KEY_PREFIX.$jti, $ttlSeconds, '1');
+        $item = $this->cache->getItem(self::KEY_PREFIX.$jti);
+        $item->set(true);
+        $item->expiresAfter($ttlSeconds);
+        $this->cache->save($item);
     }
 
     public function contains(string $jti): bool
@@ -32,6 +38,6 @@ final readonly class JwtTokenBlacklist
             return false;
         }
 
-        return $this->redis->exists(self::KEY_PREFIX.$jti) > 0;
+        return $this->cache->hasItem(self::KEY_PREFIX.$jti);
     }
 }
