@@ -7,6 +7,8 @@ framework:
             cache.feed:
                 adapter: cache.app
                 default_lifetime: 30
+            cache.jwt_blocklist:
+                adapter: cache.app
 
 when@test:
     framework:
@@ -16,3 +18,5 @@ when@test:
                 cache.feed:
                     adapter: cache.app
                     default_lifetime: 30
+                cache.jwt_blocklist:
+                    adapter: cache.app

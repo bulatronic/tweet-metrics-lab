@@ -10,21 +10,13 @@ use App\Like\Domain\Entity\Like;
 use App\Like\Domain\Exception\LikeNotFoundException;
 use App\Like\Domain\Repository\LikeRepositoryInterface;
 use App\Shared\Domain\EventPublisherInterface;
-use App\Shared\Domain\Exception\InvalidUuidException;
-use App\Shared\Domain\TransactionManagerInterface;
 use App\Tweet\Domain\Event\TweetWasUnliked;
 use App\Tweet\Domain\ValueObject\TweetId;
 use App\User\Domain\ValueObject\UserId;
 use PHPUnit\Framework\TestCase;
-use Random\RandomException;
 
 final class UnlikeTweetHandlerTest extends TestCase
 {
-    /**
-     * @throws RandomException
-     * @throws InvalidUuidException
-     * @throws LikeNotFoundException
-     */
     public function testRemovesLikeAndPublishesUnlikedEvent(): void
     {
         $tweetId = TweetId::generate();
@@ -48,11 +40,7 @@ final class UnlikeTweetHandlerTest extends TestCase
                     && $event->userId->equals($userId);
             }));
 
-        $handler = new UnlikeTweetHandler(
-            $likeRepository,
-            $eventPublisher,
-            $this->transactionManager(),
-        );
+        $handler = new UnlikeTweetHandler($likeRepository, $eventPublisher);
 
         $handler(new UnlikeTweetCommand(
             $tweetId->toString(),
@@ -60,10 +48,6 @@ final class UnlikeTweetHandlerTest extends TestCase
         ));
     }
 
-    /**
-     * @throws RandomException
-     * @throws InvalidUuidException
-     */
     public function testThrowsWhenLikeMissing(): void
     {
         $likeRepository = $this->createStub(LikeRepositoryInterface::class);
@@ -72,7 +56,6 @@ final class UnlikeTweetHandlerTest extends TestCase
         $handler = new UnlikeTweetHandler(
             $likeRepository,
             $this->createStub(EventPublisherInterface::class),
-            $this->transactionManager(),
         );
 
         $this->expectException(LikeNotFoundException::class);
@@ -81,15 +64,5 @@ final class UnlikeTweetHandlerTest extends TestCase
             TweetId::generate()->toString(),
             UserId::generate()->toString(),
         ));
-    }
-
-    private function transactionManager(): TransactionManagerInterface
-    {
-        $transactionManager = $this->createStub(TransactionManagerInterface::class);
-        $transactionManager
-            ->method('transactional')
-            ->willReturnCallback(static fn (callable $callback): mixed => $callback());
-
-        return $transactionManager;
     }
 }

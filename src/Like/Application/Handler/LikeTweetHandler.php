@@ -10,7 +10,6 @@ use App\Like\Domain\Exception\LikeAlreadyExistsException;
 use App\Like\Domain\Repository\LikeRepositoryInterface;
 use App\Shared\Domain\EventPublisherInterface;
 use App\Shared\Domain\Exception\InvalidUuidException;
-use App\Shared\Domain\TransactionManagerInterface;
 use App\Tweet\Domain\Event\TweetWasLiked;
 use App\Tweet\Domain\Exception\TweetNotFoundException;
 use App\Tweet\Domain\Repository\TweetRepositoryInterface;
@@ -29,7 +28,6 @@ final readonly class LikeTweetHandler
         private TweetRepositoryInterface $tweetRepository,
         private UserRepositoryInterface $userRepository,
         private EventPublisherInterface $eventPublisher,
-        private TransactionManagerInterface $transactionManager,
     ) {
     }
 
@@ -59,13 +57,11 @@ final readonly class LikeTweetHandler
 
         $like = Like::create($tweetId, $userId);
 
-        $this->transactionManager->transactional(function () use ($like, $tweetId, $userId): void {
-            $this->likeRepository->save($like);
-            $this->eventPublisher->publish(new TweetWasLiked(
-                $tweetId,
-                $userId,
-                $like->createdAt(),
-            ));
-        });
+        $this->likeRepository->save($like);
+        $this->eventPublisher->publish(new TweetWasLiked(
+            $tweetId,
+            $userId,
+            $like->createdAt(),
+        ));
     }
 }

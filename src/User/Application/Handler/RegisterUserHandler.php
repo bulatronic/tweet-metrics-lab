@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\User\Application\Handler;
 
 use App\Shared\Domain\Exception\InvalidUuidException;
-use App\Shared\Domain\TransactionManagerInterface;
 use App\User\Application\Command\RegisterUserCommand;
 use App\User\Domain\Entity\User;
 use App\User\Domain\Exception\InvalidEmailException;
@@ -24,7 +23,6 @@ final readonly class RegisterUserHandler
     public function __construct(
         private UserRepositoryInterface $userRepository,
         private PasswordHasherInterface $passwordHasher,
-        private TransactionManagerInterface $transactionManager,
     ) {
     }
 
@@ -35,7 +33,7 @@ final readonly class RegisterUserHandler
      * @throws InvalidUuidException
      * @throws InvalidEmailException
      */
-    public function __invoke(RegisterUserCommand $command): void
+    public function __invoke(RegisterUserCommand $command): string
     {
         $email = Email::fromString($command->email);
         $username = Username::fromString($command->username);
@@ -51,8 +49,8 @@ final readonly class RegisterUserHandler
         $passwordHash = $this->passwordHasher->hash($command->plainPassword);
         $user = User::register($email, $passwordHash, $username);
 
-        $this->transactionManager->transactional(function () use ($user): void {
-            $this->userRepository->save($user);
-        });
+        $this->userRepository->save($user);
+
+        return $user->id()->toString();
     }
 }

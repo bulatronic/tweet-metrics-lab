@@ -6,7 +6,6 @@ namespace App\Tweet\Application\Handler;
 
 use App\Shared\Domain\EventPublisherInterface;
 use App\Shared\Domain\Exception\InvalidUuidException;
-use App\Shared\Domain\TransactionManagerInterface;
 use App\Tweet\Application\Command\CreateTweetCommand;
 use App\Tweet\Domain\Entity\Tweet;
 use App\Tweet\Domain\Event\TweetWasCreated;
@@ -26,7 +25,6 @@ final readonly class CreateTweetHandler
         private TweetRepositoryInterface $tweetRepository,
         private UserRepositoryInterface $userRepository,
         private EventPublisherInterface $eventPublisher,
-        private TransactionManagerInterface $transactionManager,
     ) {
     }
 
@@ -36,7 +34,7 @@ final readonly class CreateTweetHandler
      * @throws TweetTextTooLongException
      * @throws InvalidUuidException
      */
-    public function __invoke(CreateTweetCommand $command): void
+    public function __invoke(CreateTweetCommand $command): string
     {
         $authorId = UserId::fromString($command->authorId);
 
@@ -46,13 +44,13 @@ final readonly class CreateTweetHandler
 
         $tweet = Tweet::create($authorId, TweetText::fromString($command->text));
 
-        $this->transactionManager->transactional(function () use ($tweet): void {
-            $this->tweetRepository->save($tweet);
-            $this->eventPublisher->publish(new TweetWasCreated(
-                $tweet->id(),
-                $tweet->authorId(),
-                $tweet->createdAt(),
-            ));
-        });
+        $this->tweetRepository->save($tweet);
+        $this->eventPublisher->publish(new TweetWasCreated(
+            $tweet->id(),
+            $tweet->authorId(),
+            $tweet->createdAt(),
+        ));
+
+        return $tweet->id()->toString();
     }
 }

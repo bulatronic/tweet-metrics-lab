@@ -31,8 +31,8 @@ security:
                 check_path: /api/login
                 username_path: email
                 password_path: password
-                success_handler: lexik_jwt_authentication.handler.authentication_success
-                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+                success_handler: App\User\Infrastructure\Security\ApiKitAuthenticationSuccessHandler
+                failure_handler: App\User\Infrastructure\Security\ApiKitAuthenticationFailureHandler
 
         refresh:
             pattern: ^/api/token/refresh
@@ -40,6 +40,7 @@ security:
             provider: app_user_provider
             refresh_jwt:
                 check_path: /api/token/refresh
+                success_handler: App\User\Infrastructure\Security\ApiKitAuthenticationSuccessHandler
 
         api:
             pattern: ^/api
@@ -53,8 +54,10 @@ security:
 
     # Note: Only the *first* matching rule is applied
     access_control:
+        - { path: ^/api/register, roles: PUBLIC_ACCESS }
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
         - { path: ^/api/token/refresh, roles: PUBLIC_ACCESS }
+        - { path: ^/api/doc, roles: PUBLIC_ACCESS }
         - { path: ^/metrics, roles: PUBLIC_ACCESS }
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
 

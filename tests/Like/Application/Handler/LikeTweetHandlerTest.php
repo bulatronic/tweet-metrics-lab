@@ -10,19 +10,13 @@ use App\Like\Domain\Entity\Like;
 use App\Like\Domain\Exception\LikeAlreadyExistsException;
 use App\Like\Domain\Repository\LikeRepositoryInterface;
 use App\Shared\Domain\EventPublisherInterface;
-use App\Shared\Domain\Exception\InvalidUuidException;
-use App\Shared\Domain\TransactionManagerInterface;
 use App\Tweet\Domain\Entity\Tweet;
 use App\Tweet\Domain\Event\TweetWasLiked;
 use App\Tweet\Domain\Exception\TweetNotFoundException;
-use App\Tweet\Domain\Exception\TweetTextTooLongException;
 use App\Tweet\Domain\Repository\TweetRepositoryInterface;
 use App\Tweet\Domain\ValueObject\TweetId;
 use App\Tweet\Domain\ValueObject\TweetText;
 use App\User\Domain\Entity\User;
-use App\User\Domain\Exception\InvalidEmailException;
-use App\User\Domain\Exception\InvalidPasswordHashException;
-use App\User\Domain\Exception\InvalidUsernameException;
 use App\User\Domain\Exception\UserNotFoundException;
 use App\User\Domain\Repository\UserRepositoryInterface;
 use App\User\Domain\ValueObject\Email;
@@ -30,21 +24,9 @@ use App\User\Domain\ValueObject\PasswordHash;
 use App\User\Domain\ValueObject\UserId;
 use App\User\Domain\ValueObject\Username;
 use PHPUnit\Framework\TestCase;
-use Random\RandomException;
 
 final class LikeTweetHandlerTest extends TestCase
 {
-    /**
-     * @throws RandomException
-     * @throws InvalidUsernameException
-     * @throws UserNotFoundException
-     * @throws TweetTextTooLongException
-     * @throws TweetNotFoundException
-     * @throws InvalidPasswordHashException
-     * @throws LikeAlreadyExistsException
-     * @throws InvalidUuidException
-     * @throws InvalidEmailException
-     */
     public function testPublishesLikedEventWithoutUpdatingTweetCounters(): void
     {
         $user = User::reconstitute(
@@ -85,7 +67,6 @@ final class LikeTweetHandlerTest extends TestCase
             $tweetRepository,
             $userRepository,
             $eventPublisher,
-            $this->transactionManager(),
         );
 
         $handler(new LikeTweetCommand(
@@ -94,12 +75,6 @@ final class LikeTweetHandlerTest extends TestCase
         ));
     }
 
-    /**
-     * @throws RandomException
-     * @throws LikeAlreadyExistsException
-     * @throws InvalidUuidException
-     * @throws TweetNotFoundException
-     */
     public function testThrowsWhenUserMissing(): void
     {
         $userRepository = $this->createStub(UserRepositoryInterface::class);
@@ -110,7 +85,6 @@ final class LikeTweetHandlerTest extends TestCase
             $this->createStub(TweetRepositoryInterface::class),
             $userRepository,
             $this->createStub(EventPublisherInterface::class),
-            $this->transactionManager(),
         );
 
         $this->expectException(UserNotFoundException::class);
@@ -121,15 +95,6 @@ final class LikeTweetHandlerTest extends TestCase
         ));
     }
 
-    /**
-     * @throws RandomException
-     * @throws InvalidUsernameException
-     * @throws UserNotFoundException
-     * @throws InvalidPasswordHashException
-     * @throws LikeAlreadyExistsException
-     * @throws InvalidUuidException
-     * @throws InvalidEmailException
-     */
     public function testThrowsWhenTweetMissing(): void
     {
         $user = User::reconstitute(
@@ -151,7 +116,6 @@ final class LikeTweetHandlerTest extends TestCase
             $tweetRepository,
             $userRepository,
             $this->createStub(EventPublisherInterface::class),
-            $this->transactionManager(),
         );
 
         $this->expectException(TweetNotFoundException::class);
@@ -162,16 +126,6 @@ final class LikeTweetHandlerTest extends TestCase
         ));
     }
 
-    /**
-     * @throws RandomException
-     * @throws InvalidUsernameException
-     * @throws UserNotFoundException
-     * @throws TweetTextTooLongException
-     * @throws TweetNotFoundException
-     * @throws InvalidPasswordHashException
-     * @throws InvalidUuidException
-     * @throws InvalidEmailException
-     */
     public function testThrowsWhenLikeAlreadyExists(): void
     {
         $user = User::reconstitute(
@@ -197,7 +151,6 @@ final class LikeTweetHandlerTest extends TestCase
             $tweetRepository,
             $userRepository,
             $this->createStub(EventPublisherInterface::class),
-            $this->transactionManager(),
         );
 
         $this->expectException(LikeAlreadyExistsException::class);
@@ -206,15 +159,5 @@ final class LikeTweetHandlerTest extends TestCase
             $tweet->id()->toString(),
             $user->id()->toString(),
         ));
-    }
-
-    private function transactionManager(): TransactionManagerInterface
-    {
-        $transactionManager = $this->createStub(TransactionManagerInterface::class);
-        $transactionManager
-            ->method('transactional')
-            ->willReturnCallback(static fn (callable $callback): mixed => $callback());
-
-        return $transactionManager;
     }
 }

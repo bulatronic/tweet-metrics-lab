@@ -61,9 +61,16 @@ services:
 
     App\User\Domain\Service\PasswordHasherInterface: '@App\User\Infrastructure\Service\SymfonyPasswordHasher'
     App\Shared\Domain\EventPublisherInterface: '@App\Shared\Infrastructure\Outbox\DoctrineOutboxPublisher'
-    App\Shared\Domain\TransactionManagerInterface: '@App\Shared\Infrastructure\Persistence\DoctrineTransactionManager'
 
     # Share artprima's CollectorRegistry with tasko messenger metrics
     # so counters/gauges appear on /metrics/prometheus (Redis-backed).
     Prometheus\CollectorRegistry: '@prometheus_metrics_bundle.collector_registry'
     Prometheus\RegistryInterface: '@prometheus_metrics_bundle.collector_registry'
+
+    App\User\Infrastructure\Security\ApiKitAuthenticationSuccessHandler:
+        arguments:
+            $inner: '@lexik_jwt_authentication.handler.authentication_success'
+
+    App\User\Infrastructure\Security\ApiKitAuthenticationFailureHandler:
+        arguments:
+            $inner: '@lexik_jwt_authentication.handler.authentication_failure'

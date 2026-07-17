@@ -9,7 +9,6 @@ use App\Like\Domain\Exception\LikeNotFoundException;
 use App\Like\Domain\Repository\LikeRepositoryInterface;
 use App\Shared\Domain\EventPublisherInterface;
 use App\Shared\Domain\Exception\InvalidUuidException;
-use App\Shared\Domain\TransactionManagerInterface;
 use App\Tweet\Domain\Event\TweetWasUnliked;
 use App\Tweet\Domain\ValueObject\TweetId;
 use App\User\Domain\ValueObject\UserId;
@@ -21,7 +20,6 @@ final readonly class UnlikeTweetHandler
     public function __construct(
         private LikeRepositoryInterface $likeRepository,
         private EventPublisherInterface $eventPublisher,
-        private TransactionManagerInterface $transactionManager,
     ) {
     }
 
@@ -39,10 +37,8 @@ final readonly class UnlikeTweetHandler
             throw new LikeNotFoundException($tweetId, $userId);
         }
 
-        $this->transactionManager->transactional(function () use ($like, $tweetId, $userId): void {
-            $occurredAt = new \DateTimeImmutable();
-            $this->likeRepository->remove($like);
-            $this->eventPublisher->publish(new TweetWasUnliked($tweetId, $userId, $occurredAt));
-        });
+        $occurredAt = new \DateTimeImmutable();
+        $this->likeRepository->remove($like);
+        $this->eventPublisher->publish(new TweetWasUnliked($tweetId, $userId, $occurredAt));
     }
 }

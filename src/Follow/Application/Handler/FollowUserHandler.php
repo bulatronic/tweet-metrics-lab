@@ -12,7 +12,6 @@ use App\Follow\Domain\Exception\FollowAlreadyExistsException;
 use App\Follow\Domain\Repository\FollowRepositoryInterface;
 use App\Shared\Domain\EventPublisherInterface;
 use App\Shared\Domain\Exception\InvalidUuidException;
-use App\Shared\Domain\TransactionManagerInterface;
 use App\User\Domain\Exception\UserNotFoundException;
 use App\User\Domain\Repository\UserRepositoryInterface;
 use App\User\Domain\ValueObject\UserId;
@@ -26,7 +25,6 @@ final readonly class FollowUserHandler
         private FollowRepositoryInterface $followRepository,
         private UserRepositoryInterface $userRepository,
         private EventPublisherInterface $eventPublisher,
-        private TransactionManagerInterface $transactionManager,
     ) {
     }
 
@@ -56,13 +54,11 @@ final readonly class FollowUserHandler
 
         $follow = Follow::create($followerId, $followeeId);
 
-        $this->transactionManager->transactional(function () use ($follow): void {
-            $this->followRepository->save($follow);
-            $this->eventPublisher->publish(new UserWasFollowed(
-                $follow->followerId(),
-                $follow->followeeId(),
-                $follow->createdAt(),
-            ));
-        });
+        $this->followRepository->save($follow);
+        $this->eventPublisher->publish(new UserWasFollowed(
+            $follow->followerId(),
+            $follow->followeeId(),
+            $follow->createdAt(),
+        ));
     }
 }

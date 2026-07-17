@@ -6,6 +6,7 @@ framework:
             command.bus:
                 middleware:
                     - App\Shared\Infrastructure\Messenger\CommandMetricsMiddleware
+                    - doctrine_transaction
 
             query.bus: ~
 
