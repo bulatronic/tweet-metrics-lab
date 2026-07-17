@@ -6,6 +6,7 @@ namespace App\Tweet\Infrastructure\Persistence;
 
 use App\Shared\Domain\Exception\InvalidUuidException;
 use App\Tweet\Domain\Entity\Tweet;
+use App\Tweet\Domain\Exception\TweetTextTooLongException;
 use App\Tweet\Domain\Repository\TweetRepositoryInterface;
 use App\Tweet\Domain\ValueObject\TweetId;
 use App\Tweet\Domain\ValueObject\TweetText;
@@ -45,9 +46,12 @@ final readonly class DoctrineTweetRepository implements TweetRepositoryInterface
         $this->entityManager->flush();
     }
 
+
     /**
      * @throws OptimisticLockException
-     * @throws ORMException|InvalidUuidException
+     * @throws ORMException
+     * @throws TweetTextTooLongException
+     * @throws InvalidUuidException
      */
     public function findById(TweetId $id): ?Tweet
     {
@@ -60,6 +64,24 @@ final readonly class DoctrineTweetRepository implements TweetRepositoryInterface
     }
 
     /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
+    public function delete(Tweet $tweet): void
+    {
+        $existing = $this->entityManager->find(
+            DoctrineTweet::class,
+            Uuid::fromString($tweet->id()->toString()),
+        );
+
+        if (null !== $existing) {
+            $this->entityManager->remove($existing);
+            $this->entityManager->flush();
+        }
+    }
+
+    /**
+     * @throws TweetTextTooLongException
      * @throws InvalidUuidException
      */
     private function toDomain(DoctrineTweet $entity): Tweet

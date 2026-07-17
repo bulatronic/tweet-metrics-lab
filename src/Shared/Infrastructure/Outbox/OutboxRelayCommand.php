@@ -12,8 +12,8 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -34,7 +34,8 @@ final class OutboxRelayCommand extends Command
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly OutboxMessageRepository $outboxMessageRepository,
-        private readonly MessageBusInterface $messageBus,
+        #[Autowire(service: 'event.bus')]
+        private readonly MessageBusInterface $eventBus,
         private readonly SerializerInterface $serializer,
         private readonly OutboxMetrics $outboxMetrics,
         private readonly LoggerInterface $logger,
@@ -116,7 +117,7 @@ final class OutboxRelayCommand extends Command
                 foreach ($messages as $message) {
                     try {
                         $event = $this->deserialize($message);
-                        $this->messageBus->dispatch($event, [new TransportNamesStamp(['async'])]);
+                        $this->eventBus->dispatch($event);
 
                         $publishedAt = new \DateTimeImmutable();
                         $message->markPublished($publishedAt);

@@ -11,5 +11,7 @@ interface TweetRepositoryInterface
 {
     public function save(Tweet $tweet): void;
 
+    public function delete(Tweet $tweet): void;
+
     public function findById(TweetId $id): ?Tweet;
 }

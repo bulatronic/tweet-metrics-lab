@@ -1,5 +1,5 @@
 # Messenger metrics (tasko-products/symfony-prometheus-exporter).
-# Middleware is registered on the default bus in messenger.yaml.
+# Middleware is registered on event.bus in messenger.yaml.
 tasko_products_symfony_prometheus_exporter:
     middlewares:
         event_middleware:
