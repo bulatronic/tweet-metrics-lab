@@ -3,28 +3,29 @@ deptrac:
         - ./src
     exclude_files:
         - '#.*test.*#'
+        - '#.*Kernel\.php$#'
+        - '#.*DataFixtures.*#'
     layers:
-        -
-            name: Controller
+        -   name: Domain
             collectors:
-                -
-                    type: classLike
-                    value: .*Controller.*
-        -
-            name: Repository
+                -   type: classLike
+                    value: App\\.+\\Domain\\.*
+                -   type: classLike
+                    value: App\\Shared\\Domain\\.*
+        -   name: Application
             collectors:
-                -
-                    type: classLike
-                    value: .*Repository.*
-        -
-            name: Service
+                -   type: classLike
+                    value: App\\.+\\Application\\.*
+        -   name: Infrastructure
             collectors:
-                -
-                    type: classLike
-                    value: .*Service.*
+                -   type: classLike
+                    value: App\\.+\\Infrastructure\\.*
+                -   type: classLike
+                    value: App\\Shared\\Infrastructure\\.*
     ruleset:
-        Controller:
-            - Service
-        Service:
-            - Repository
-        Repository:
+        Domain: ~
+        Application:
+            - Domain
+        Infrastructure:
+            - Domain
+            - Application
