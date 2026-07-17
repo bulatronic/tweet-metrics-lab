@@ -19,7 +19,7 @@ services:
         exclude:
             - '../src/User/Domain/Entity/'
             - '../src/User/Domain/ValueObject/'
-            - '../src/User/Infrastructure/Persistence/Doctrine*.php'
+            - '../src/User/Infrastructure/Persistence/DoctrineUser.php'
             - '../src/User/Infrastructure/Persistence/RefreshToken.php'
 
     App\Tweet\:
@@ -27,21 +27,21 @@ services:
         exclude:
             - '../src/Tweet/Domain/Entity/'
             - '../src/Tweet/Domain/ValueObject/'
-            - '../src/Tweet/Infrastructure/Persistence/Doctrine*.php'
+            - '../src/Tweet/Infrastructure/Persistence/DoctrineTweet.php'
 
     App\Like\:
         resource: '../src/Like/'
         exclude:
             - '../src/Like/Domain/Entity/'
             - '../src/Like/Domain/ValueObject/'
-            - '../src/Like/Infrastructure/Persistence/Doctrine*.php'
+            - '../src/Like/Infrastructure/Persistence/DoctrineLike.php'
 
     App\Follow\:
         resource: '../src/Follow/'
         exclude:
             - '../src/Follow/Domain/Entity/'
             - '../src/Follow/Domain/ValueObject/'
-            - '../src/Follow/Infrastructure/Persistence/Doctrine*.php'
+            - '../src/Follow/Infrastructure/Persistence/DoctrineFollow.php'
 
     App\Search\:
         resource: '../src/Search/'
@@ -49,7 +49,16 @@ services:
     App\Shared\:
         resource: '../src/Shared/'
         exclude:
+            - '../src/Shared/Domain/'
             - '../src/Shared/Infrastructure/Outbox/OutboxMessage.php'
+
+    # Domain repository → Doctrine implementations
+    App\User\Domain\Repository\UserRepositoryInterface: '@App\User\Infrastructure\Persistence\DoctrineUserRepository'
+    App\Tweet\Domain\Repository\TweetRepositoryInterface: '@App\Tweet\Infrastructure\Persistence\DoctrineTweetRepository'
+    App\Like\Domain\Repository\LikeRepositoryInterface: '@App\Like\Infrastructure\Persistence\DoctrineLikeRepository'
+    App\Follow\Domain\Repository\FollowRepositoryInterface: '@App\Follow\Infrastructure\Persistence\DoctrineFollowRepository'
+
+    App\User\Domain\Service\PasswordHasherInterface: '@App\User\Infrastructure\Service\SymfonyPasswordHasher'
 
     # Share artprima's CollectorRegistry with tasko messenger metrics
     # so counters/gauges appear on /metrics/prometheus (Redis-backed).

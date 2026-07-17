@@ -7,6 +7,8 @@ doctrine:
         #server_version: '16'
 
         profiling_collect_backtrace: '%kernel.debug%'
+        types:
+            uuid: Symfony\Bridge\Doctrine\Types\UuidType
     orm:
         validate_xml_mapping: true
         naming_strategy: doctrine.orm.naming_strategy.underscore
@@ -27,6 +29,24 @@ doctrine:
                 dir: '%kernel.project_dir%/src/User/Infrastructure/Persistence'
                 prefix: 'App\User\Infrastructure\Persistence'
                 alias: User
+            Tweet:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Tweet/Infrastructure/Persistence'
+                prefix: 'App\Tweet\Infrastructure\Persistence'
+                alias: Tweet
+            Like:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Like/Infrastructure/Persistence'
+                prefix: 'App\Like\Infrastructure\Persistence'
+                alias: Like
+            Follow:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Follow/Infrastructure/Persistence'
+                prefix: 'App\Follow\Infrastructure\Persistence'
+                alias: Follow
 
 when@test:
     doctrine:
