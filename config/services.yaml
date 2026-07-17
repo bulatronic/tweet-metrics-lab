@@ -28,6 +28,7 @@ services:
             - '../src/Tweet/Domain/Entity/'
             - '../src/Tweet/Domain/ValueObject/'
             - '../src/Tweet/Infrastructure/Persistence/DoctrineTweet.php'
+            - '../src/Tweet/Infrastructure/Persistence/DoctrineFeedItem.php'
 
     App\Like\:
         resource: '../src/Like/'

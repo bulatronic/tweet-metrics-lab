@@ -11,9 +11,6 @@ use App\Shared\Domain\EventPublisherInterface;
 use App\Shared\Domain\Exception\InvalidUuidException;
 use App\Shared\Domain\TransactionManagerInterface;
 use App\Tweet\Domain\Event\TweetWasUnliked;
-use App\Tweet\Domain\Exception\CannotDecrementLikesException;
-use App\Tweet\Domain\Exception\TweetNotFoundException;
-use App\Tweet\Domain\Repository\TweetRepositoryInterface;
 use App\Tweet\Domain\ValueObject\TweetId;
 use App\User\Domain\ValueObject\UserId;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -23,17 +20,14 @@ final readonly class UnlikeTweetHandler
 {
     public function __construct(
         private LikeRepositoryInterface $likeRepository,
-        private TweetRepositoryInterface $tweetRepository,
         private EventPublisherInterface $eventPublisher,
         private TransactionManagerInterface $transactionManager,
     ) {
     }
 
     /**
-     * @throws CannotDecrementLikesException
      * @throws LikeNotFoundException
      * @throws InvalidUuidException
-     * @throws TweetNotFoundException
      */
     public function __invoke(UnlikeTweetCommand $command): void
     {
@@ -45,17 +39,9 @@ final readonly class UnlikeTweetHandler
             throw new LikeNotFoundException($tweetId, $userId);
         }
 
-        $tweet = $this->tweetRepository->findById($tweetId);
-        if (null === $tweet) {
-            throw new TweetNotFoundException($tweetId);
-        }
-
-        $tweet->decrementLikes();
-        $occurredAt = new \DateTimeImmutable();
-
-        $this->transactionManager->transactional(function () use ($like, $tweet, $tweetId, $userId, $occurredAt): void {
+        $this->transactionManager->transactional(function () use ($like, $tweetId, $userId): void {
+            $occurredAt = new \DateTimeImmutable();
             $this->likeRepository->remove($like);
-            $this->tweetRepository->save($tweet);
             $this->eventPublisher->publish(new TweetWasUnliked($tweetId, $userId, $occurredAt));
         });
     }

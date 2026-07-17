@@ -46,7 +46,6 @@ final readonly class DoctrineTweetRepository implements TweetRepositoryInterface
         $this->entityManager->flush();
     }
 
-
     /**
      * @throws OptimisticLockException
      * @throws ORMException

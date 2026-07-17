@@ -49,8 +49,7 @@ final readonly class LikeTweetHandler
             throw new UserNotFoundException($userId);
         }
 
-        $tweet = $this->tweetRepository->findById($tweetId);
-        if (null === $tweet) {
+        if (null === $this->tweetRepository->findById($tweetId)) {
             throw new TweetNotFoundException($tweetId);
         }
 
@@ -59,13 +58,14 @@ final readonly class LikeTweetHandler
         }
 
         $like = Like::create($tweetId, $userId);
-        $tweet->incrementLikes();
-        $occurredAt = $like->createdAt();
 
-        $this->transactionManager->transactional(function () use ($like, $tweet, $tweetId, $userId, $occurredAt): void {
+        $this->transactionManager->transactional(function () use ($like, $tweetId, $userId): void {
             $this->likeRepository->save($like);
-            $this->tweetRepository->save($tweet);
-            $this->eventPublisher->publish(new TweetWasLiked($tweetId, $userId, $occurredAt));
+            $this->eventPublisher->publish(new TweetWasLiked(
+                $tweetId,
+                $userId,
+                $like->createdAt(),
+            ));
         });
     }
 }
