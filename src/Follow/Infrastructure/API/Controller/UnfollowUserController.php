@@ -11,6 +11,7 @@ use App\Shared\Infrastructure\Messenger\HandleTrait;
 use App\User\Infrastructure\API\Request\UserIdRequest;
 use App\User\Infrastructure\Persistence\DoctrineUser;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\Exception\ExceptionInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
@@ -24,6 +25,9 @@ final class UnfollowUserController extends AbstractApiController
     ) {
     }
 
+    /**
+     * @throws ExceptionInterface
+     */
     #[Route('/api/users/{id}/follow', name: 'api_users_unfollow', methods: ['DELETE'])]
     public function __invoke(
         #[MapRoutePayload] UserIdRequest $request,

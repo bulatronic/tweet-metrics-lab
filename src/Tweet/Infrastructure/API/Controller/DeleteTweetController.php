@@ -10,6 +10,7 @@ use App\Shared\Infrastructure\Messenger\HandleTrait;
 use App\Tweet\Application\Command\DeleteTweetCommand;
 use App\Tweet\Infrastructure\API\Request\TweetIdRequest;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\Exception\ExceptionInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -22,6 +23,9 @@ final class DeleteTweetController extends AbstractApiController
     ) {
     }
 
+    /**
+     * @throws ExceptionInterface
+     */
     #[Route('/api/tweets/{id}', name: 'api_tweets_delete', methods: ['DELETE'])]
     public function __invoke(#[MapRoutePayload] TweetIdRequest $request): Response
     {

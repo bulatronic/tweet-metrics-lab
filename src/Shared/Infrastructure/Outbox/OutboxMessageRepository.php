@@ -33,7 +33,7 @@ final readonly class OutboxMessageRepository
         $connection = $this->entityManager->getConnection();
 
         $ids = $connection->fetchFirstColumn(
-            'SELECT id FROM outbox_messages WHERE published_at IS NULL AND failed_at IS NULL ORDER BY created_at ASC LIMIT ? FOR UPDATE SKIP LOCKED',
+            'SELECT id FROM outbox_messages WHERE published_at IS NULL AND failed_at IS NULL ORDER BY created_at LIMIT ? FOR UPDATE SKIP LOCKED',
             [$limit],
             [\Doctrine\DBAL\ParameterType::INTEGER],
         );

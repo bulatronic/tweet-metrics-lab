@@ -7,6 +7,7 @@ namespace App\Search\Infrastructure\Console;
 use App\Search\Infrastructure\Elasticsearch\TweetsIndex;
 use Elastic\Elasticsearch\Client;
 use Elastic\Elasticsearch\Exception\ClientResponseException;
+use Elastic\Elasticsearch\Exception\MissingParameterException;
 use Elastic\Elasticsearch\Exception\ServerResponseException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -29,6 +30,7 @@ final class CreateTweetsIndexCommand extends Command
     /**
      * @throws ClientResponseException
      * @throws ServerResponseException
+     * @throws MissingParameterException
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {

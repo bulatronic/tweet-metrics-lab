@@ -12,6 +12,7 @@ use App\Tweet\Infrastructure\API\Request\CursorQueryDto;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
+use Symfony\Component\Messenger\Exception\ExceptionInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -25,6 +26,9 @@ final class GetFeedController extends AbstractApiController
     ) {
     }
 
+    /**
+     * @throws ExceptionInterface
+     */
     #[Route('/api/feed', name: 'api_feed', methods: ['GET'])]
     public function __invoke(#[MapQueryString] CursorQueryDto $query): JsonResponse
     {

@@ -12,6 +12,7 @@ use App\Tweet\Application\Query\GetTweetQuery;
 use App\Tweet\Infrastructure\API\Request\TweetIdRequest;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Messenger\Exception\ExceptionInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -25,6 +26,9 @@ final class GetTweetController extends AbstractApiController
     ) {
     }
 
+    /**
+     * @throws ExceptionInterface
+     */
     #[Route('/api/tweets/{id}', name: 'api_tweets_get', methods: ['GET'])]
     public function __invoke(#[MapRoutePayload] TweetIdRequest $request): JsonResponse
     {

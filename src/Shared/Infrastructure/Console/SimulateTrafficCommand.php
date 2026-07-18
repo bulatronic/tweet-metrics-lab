@@ -77,6 +77,7 @@ final class SimulateTrafficCommand extends Command
 
     /**
      * @throws RandomException
+     * @throws Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -113,7 +114,7 @@ final class SimulateTrafficCommand extends Command
                 $nextSpikeAt = $now + random_int(self::SPIKE_INTERVAL_MIN_SECONDS, self::SPIKE_INTERVAL_MAX_SECONDS);
                 'H:i:s'
                     |> date(...)
-                    |> (fn($x) => sprintf('<comment>[%s] spike ended → RPS=%d</comment>', $x, $baseRps))
+                    |> (fn ($x) => sprintf('<comment>[%s] spike ended → RPS=%d</comment>', $x, $baseRps))
                     |> $io(...);
             }
 
@@ -121,7 +122,7 @@ final class SimulateTrafficCommand extends Command
                 $spikeUntil = $now + self::SPIKE_DURATION_SECONDS;
                 'H:i:s'
                     |> date(...)
-                    |> (fn($x) => sprintf('<info>[%s] SPIKE → RPS=%d for %ds</info>', $x, $baseRps * self::SPIKE_MULTIPLIER, self::SPIKE_DURATION_SECONDS,))
+                    |> (fn ($x) => sprintf('<info>[%s] SPIKE → RPS=%d for %ds</info>', $x, $baseRps * self::SPIKE_MULTIPLIER, self::SPIKE_DURATION_SECONDS))
                     |> $io(...);
             }
 
@@ -164,7 +165,7 @@ final class SimulateTrafficCommand extends Command
             };
         } catch (HandlerFailedException $exception) {
             // Expected under random load (duplicate like/follow, self-follow, etc.)
-            if (array_any($exception->getWrappedExceptions(), fn($wrapped) => $wrapped instanceof DomainException)) {
+            if (array_any($exception->getWrappedExceptions(), fn ($wrapped) => $wrapped instanceof DomainException)) {
                 return;
             }
             $io->warning($exception->getMessage());
@@ -208,6 +209,9 @@ final class SimulateTrafficCommand extends Command
         ));
     }
 
+    /**
+     * @throws ExceptionInterface
+     */
     private function followUser(): void
     {
         $followerId = $this->pickUserId();

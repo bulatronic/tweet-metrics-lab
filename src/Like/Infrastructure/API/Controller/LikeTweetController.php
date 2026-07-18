@@ -11,6 +11,7 @@ use App\Shared\Infrastructure\Messenger\HandleTrait;
 use App\Tweet\Infrastructure\API\Request\TweetIdRequest;
 use App\User\Infrastructure\Persistence\DoctrineUser;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\Exception\ExceptionInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
@@ -24,6 +25,9 @@ final class LikeTweetController extends AbstractApiController
     ) {
     }
 
+    /**
+     * @throws ExceptionInterface
+     */
     #[Route('/api/tweets/{id}/like', name: 'api_tweets_like', methods: ['POST'])]
     public function __invoke(
         #[MapRoutePayload] TweetIdRequest $request,
