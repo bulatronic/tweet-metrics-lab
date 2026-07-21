@@ -1,5 +1,18 @@
 # tweet-metrics-lab
 
+[![PHP](https://img.shields.io/badge/PHP-8.5-777BB4?style=flat&logo=php&logoColor=white)](https://www.php.net/)
+[![Symfony](https://img.shields.io/badge/Symfony-7.4-000000?style=flat&logo=symfony&logoColor=white)](https://symfony.com/)
+[![Caddy](https://img.shields.io/badge/Caddy-server-1F88C0?style=flat&logo=caddy&logoColor=white)](https://caddyserver.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-18-336791?style=flat&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Redis](https://img.shields.io/badge/Redis-cache-DC382D?style=flat&logo=redis&logoColor=white)](https://redis.io/)
+[![RabbitMQ](https://img.shields.io/badge/RabbitMQ-3-FF6600?style=flat&logo=rabbitmq&logoColor=white)](https://www.rabbitmq.com/)
+[![Elasticsearch](https://img.shields.io/badge/Elasticsearch-8.15-005571?style=flat&logo=elasticsearch&logoColor=white)](https://www.elastic.co/elasticsearch)
+[![Prometheus](https://img.shields.io/badge/Prometheus-metrics-E6522C?style=flat&logo=prometheus&logoColor=white)](https://prometheus.io/)
+[![Grafana](https://img.shields.io/badge/Grafana-dashboards-F46800?style=flat&logo=grafana&logoColor=white)](https://grafana.com/)
+[![JWT](https://img.shields.io/badge/JWT-auth-000000?style=flat&logo=jsonwebtokens&logoColor=white)](https://jwt.io/)
+[![k6](https://img.shields.io/badge/k6-load%20testing-7D64FF?style=flat&logo=k6&logoColor=white)](https://k6.io/)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
+
 Упрощённый твиттер-клон на Symfony. Главная цель - практика observability
 (Prometheus + Grafana) к техническим собеседованиям: RED-метрики HTTP,
 доменные счётчики, outbox/очередь, кэш ленты.
