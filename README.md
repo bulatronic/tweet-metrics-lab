@@ -65,12 +65,14 @@ docker compose exec frankenphp php bin/console doctrine:fixtures:load --no-inter
 
 Логин после фикстур: `user_0@example.com` / `password`.
 
-Для асинхронных событий нужны outbox relay и consumer:
+Асинхронность поднимается вместе со стеком (тот же образ, что у `frankenphp`):
 
-```bash
-docker compose exec frankenphp php bin/console app:outbox:relay
-docker compose exec frankenphp php bin/console messenger:consume async -vv
-```
+| Сервис             | Команда                   | Роль                   |
+|--------------------|---------------------------|------------------------|
+| `outbox-relay`     | `app:outbox:relay`        | outbox в БД → RabbitMQ |
+| `messenger-worker` | `messenger:consume async` | очередь → хендлеры     |
+
+Логи: `docker compose logs -f outbox-relay messenger-worker`.
 
 ## Эндпоинты
 

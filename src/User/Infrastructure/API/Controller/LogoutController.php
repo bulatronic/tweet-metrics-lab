@@ -9,6 +9,7 @@ use App\User\Infrastructure\Security\JwtTokenBlacklist;
 use Lexik\Bundle\JWTAuthenticationBundle\Exception\JWTDecodeFailureException;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\TokenExtractor\TokenExtractorInterface;
+use OpenApi\Attributes as OA;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,6 +31,16 @@ final class LogoutController extends AbstractApiController
     ) {
     }
 
+    #[OA\Post(
+        path: '/api/logout',
+        summary: 'Выход: заносит JWT в blacklist и гасит refresh-токен',
+        security: [['Bearer' => []]],
+        tags: ['Auth'],
+        responses: [
+            new OA\Response(response: 204, description: 'Выход выполнен'),
+            new OA\Response(response: 401, description: 'Не аутентифицирован'),
+        ],
+    )]
     #[Route('/api/logout', name: 'api_logout', methods: ['POST'])]
     public function __invoke(Request $request): Response
     {

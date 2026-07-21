@@ -21,6 +21,52 @@ services:
             - rabbitmq
             - elasticsearch
 
+    # Читает outbox-таблицу, публикует в RabbitMQ
+    outbox-relay:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: tweet-outbox-relay
+        restart: unless-stopped
+        volumes:
+            - .:/app
+        environment:
+            - APP_ENV=dev
+            - APP_DEBUG=1
+        command: [ "php", "bin/console", "app:outbox:relay" ]
+        networks:
+            - tweet-network
+        depends_on:
+            - database
+            - rabbitmq
+
+    # Обрабатывает async-очередь (feed projection, counters, search, …)
+    messenger-worker:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: tweet-messenger-worker
+        restart: unless-stopped
+        volumes:
+            - .:/app
+        environment:
+            - APP_ENV=dev
+            - APP_DEBUG=1
+        command:
+            - php
+            - bin/console
+            - messenger:consume
+            - async
+            - --memory-limit=256M
+            - -vv
+        networks:
+            - tweet-network
+        depends_on:
+            - database
+            - redis
+            - rabbitmq
+            - elasticsearch
+
     database:
         image: postgres:18-alpine
         container_name: tweet-database

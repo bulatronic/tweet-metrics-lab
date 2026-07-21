@@ -2,8 +2,79 @@ nelmio_api_doc:
     documentation:
         info:
             title: TwitterMetricsLab
-            description: This is an awesome app!
+            description: >-
+                Упрощённый твиттер-клон для практики observability
+                (Prometheus + Grafana). Ответы обёрнуты в конверт api-kit:
+                успех — { success: true, data: ..., meta: {...} },
+                ошибка — { success: false, error: { code, message, details } }.
             version: 1.0.0
+        components:
+            securitySchemes:
+                Bearer:
+                    type: http
+                    scheme: bearer
+                    bearerFormat: JWT
+        # Роуты без контроллеров (обрабатываются security-firewall'ом), поэтому
+        # документируются здесь вручную.
+        paths:
+            /api/login:
+                post:
+                    tags: [ Auth ]
+                    summary: Логин, выдаёт JWT + refresh-токен
+                    requestBody:
+                        required: true
+                        content:
+                            application/json:
+                                schema:
+                                    type: object
+                                    required: [ email, password ]
+                                    properties:
+                                        email: { type: string, format: email }
+                                        password: { type: string, format: password }
+                    responses:
+                        '200':
+                            description: Аутентификация успешна
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                                        properties:
+                                            success: { type: boolean, example: true }
+                                            data:
+                                                type: object
+                                                properties:
+                                                    token: { type: string }
+                                                    refresh_token: { type: string }
+                        '401': { description: Неверные учётные данные }
+                        '429': { description: Слишком много попыток входа }
+            /api/token/refresh:
+                post:
+                    tags: [ Auth ]
+                    summary: Обновить access-токен по refresh-токену
+                    requestBody:
+                        required: true
+                        content:
+                            application/json:
+                                schema:
+                                    type: object
+                                    required: [ refresh_token ]
+                                    properties:
+                                        refresh_token: { type: string }
+                    responses:
+                        '200':
+                            description: Новый access-токен выдан
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                                        properties:
+                                            success: { type: boolean, example: true }
+                                            data:
+                                                type: object
+                                                properties:
+                                                    token: { type: string }
+                                                    refresh_token: { type: string }
+                        '401': { description: Refresh-токен недействителен или истёк }
     areas:
         path_patterns:
             - ^/api(?!/doc$)

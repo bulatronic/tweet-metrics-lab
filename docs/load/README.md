@@ -35,13 +35,8 @@ docker compose exec frankenphp php bin/console app:simulate-traffic --rps=25
 
 Остановка: `Ctrl+C` (SIGINT/SIGTERM).
 
-Нужны живые воркеры/релей, иначе очередь будет только расти:
-
-```bash
-# примеры — как у вас заведены процессы в compose/supervisor
-docker compose exec frankenphp php bin/console app:outbox:relay
-docker compose exec frankenphp php bin/console messenger:consume async -vv
-```
+Воркеры уже в `docker compose up`: сервисы `outbox-relay` и `messenger-worker`.
+Проверка: `docker compose ps` / `docker compose logs -f outbox-relay messenger-worker`.
 
 ---
 
