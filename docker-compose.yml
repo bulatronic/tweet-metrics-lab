@@ -11,7 +11,8 @@ services:
             - .:/app
         environment:
             - APP_ENV=dev
-            - APP_DEBUG=1
+            - APP_DEBUG=${APP_DEBUG:-1}
+            - LOGIN_RATE_LIMIT=${LOGIN_RATE_LIMIT:-5}
         command: [ "frankenphp", "run", "--config", "/app/Caddyfile" ]
         networks:
             - tweet-network
@@ -220,6 +221,24 @@ services:
             - --collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)
         ports:
             - "9100:9100"
+        networks:
+            - tweet-network
+
+    # HTTP-нагрузка. Не поднимается вместе со стеком (профиль load):
+    # docker compose run --rm k6
+    k6:
+        image: grafana/k6:latest
+        container_name: tweet-k6
+        profiles:
+            - load
+        environment:
+            - BASE_URL=http://frankenphp:80
+        volumes:
+            - ./docs/load:/scripts:ro
+        entrypoint:
+            - k6
+            - run
+            - /scripts/k6-http-traffic.js
         networks:
             - tweet-network
 

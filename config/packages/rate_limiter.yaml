@@ -2,7 +2,8 @@ framework:
     rate_limiter:
         login_ip:
             policy: fixed_window
-            limit: 5
+            # Raised for load tests (many VUs authenticate from one IP).
+            limit: '%env(int:LOGIN_RATE_LIMIT)%'
             interval: '1 minute'
             cache_pool: cache.rate_limiter
         create_tweet:

@@ -11,9 +11,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 final readonly class UserIdRequest
 {
     public function __construct(
-        #[Assert\NotBlank]
-        #[Assert\Uuid]
-        #[EntityExists(DoctrineUser::class)]
+        // Sequential: do not hit the database until the value is a well-formed uuid.
+        #[Assert\Sequentially([
+            new Assert\NotBlank(),
+            new Assert\Uuid(),
+            new EntityExists(DoctrineUser::class),
+        ])]
         public string $id,
     ) {
     }

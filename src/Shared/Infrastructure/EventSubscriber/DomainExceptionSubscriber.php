@@ -22,6 +22,7 @@ use App\User\Domain\Exception\UserNotFoundException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Messenger\Exception\HandlerFailedException;
 
 /**
  * Maps DomainException to ApiException so api-kit ExceptionListener can format the response.
@@ -38,12 +39,35 @@ final class DomainExceptionSubscriber implements EventSubscriberInterface
 
     public function onKernelException(ExceptionEvent $event): void
     {
-        $throwable = $event->getThrowable();
-        if (!$throwable instanceof DomainException) {
+        $domainException = $this->extractDomainException($event->getThrowable());
+        if (null === $domainException) {
             return;
         }
 
-        $event->setThrowable($this->toApiException($throwable));
+        $event->setThrowable($this->toApiException($domainException));
+    }
+
+    /**
+     * Messenger wraps handler exceptions into HandlerFailedException, so unwrap before mapping.
+     */
+    private function extractDomainException(\Throwable $throwable): ?DomainException
+    {
+        while (null !== $throwable) {
+            if ($throwable instanceof DomainException) {
+                return $throwable;
+            }
+
+            if ($throwable instanceof HandlerFailedException) {
+                $wrapped = $throwable->getWrappedExceptions();
+                $throwable = [] === $wrapped ? $throwable->getPrevious() : reset($wrapped);
+
+                continue;
+            }
+
+            $throwable = $throwable->getPrevious();
+        }
+
+        return null;
     }
 
     private function toApiException(DomainException $exception): ApiException

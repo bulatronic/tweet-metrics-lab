@@ -53,7 +53,36 @@ docker compose exec frankenphp php bin/console app:simulate-traffic --rps=25
 
 Профиль: ramp-up → 50 VU → плато 3 мин → ramp-down.
 
-Установка [k6](https://k6.io/docs/get-started/installation/) на хосте, затем:
+### Перед прогоном: лимит логина
+
+Все VU логинятся с одного IP, а `login_ip` по умолчанию — 5 запросов в минуту,
+поэтому без поднятого лимита почти все VU получат 429 вместо токена.
+Подними лимит (и заодно выключи debug для честных задержек) и пересоздай app:
+
+```bash
+APP_DEBUG=0 LOGIN_RATE_LIMIT=10000 docker compose up -d frankenphp
+```
+
+Вернуть боевые значения после прогона:
+
+```bash
+docker compose up -d frankenphp
+```
+
+### Вариант A — в Docker (k6 на хосте не нужен)
+
+Сервис `k6` объявлен в `docker-compose.yml` под профилем `load`, поэтому
+вместе со стеком не поднимается:
+
+```bash
+docker compose run --rm k6
+```
+
+Внутри сети контейнер ходит на `http://frankenphp:80` (не `localhost:8000`).
+
+### Вариант B — k6 установлен на хосте
+
+Установка: [k6.io/docs](https://k6.io/docs/get-started/installation/).
 
 ```bash
 k6 run -e BASE_URL=http://localhost:8000 docs/load/k6-http-traffic.js
@@ -66,6 +95,15 @@ k6 run -e BASE_URL=http://localhost:8000 -e PASSWORD=password docs/load/k6-http-
 ```
 
 Логины фикстур: `user_0@example.com` … `user_399@example.com` / `password`.
+
+### Что смотреть в итоговой сводке
+
+| Метрика                         | Смысл                                |
+|---------------------------------|--------------------------------------|
+| `http_reqs` (rate)              | суммарный RPS                        |
+| `feed_latency_ms` p(95)         | p95 ленты (кэш Redis)                |
+| `tweet_create_latency_ms` p(95) | p95 записи                           |
+| `http_req_failed`               | доля ошибок (~5% намеренных 4xx/401) |
 
 ---
 
