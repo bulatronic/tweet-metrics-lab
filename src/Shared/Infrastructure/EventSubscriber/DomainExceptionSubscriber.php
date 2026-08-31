@@ -12,6 +12,7 @@ use App\Like\Domain\Exception\LikeAlreadyExistsException;
 use App\Like\Domain\Exception\LikeNotFoundException;
 use App\Shared\Domain\Exception\DomainException;
 use App\Shared\Domain\Exception\InvalidUuidException;
+use App\Shared\Infrastructure\Exception\ThrowableChain;
 use App\Tweet\Domain\Exception\CannotDecrementLikesException;
 use App\Tweet\Domain\Exception\TweetNotFoundException;
 use App\Tweet\Domain\Exception\TweetTextTooLongException;
@@ -22,7 +23,6 @@ use App\User\Domain\Exception\UserNotFoundException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\Messenger\Exception\HandlerFailedException;
 
 /**
  * Maps DomainException to ApiException so api-kit ExceptionListener can format the response.
@@ -52,19 +52,10 @@ final class DomainExceptionSubscriber implements EventSubscriberInterface
      */
     private function extractDomainException(\Throwable $throwable): ?DomainException
     {
-        while (null !== $throwable) {
-            if ($throwable instanceof DomainException) {
-                return $throwable;
+        foreach (ThrowableChain::unwrap($throwable) as $current) {
+            if ($current instanceof DomainException) {
+                return $current;
             }
-
-            if ($throwable instanceof HandlerFailedException) {
-                $wrapped = $throwable->getWrappedExceptions();
-                $throwable = [] === $wrapped ? $throwable->getPrevious() : reset($wrapped);
-
-                continue;
-            }
-
-            $throwable = $throwable->getPrevious();
         }
 
         return null;

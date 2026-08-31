@@ -514,10 +514,10 @@
       },
       "targets": [
         {
-          "expr": "rate(${namespace}_exception{job=\"$job\"}[5m])",
+          "expr": "sum by (class, status) (rate(${namespace}_exception{job=\"$job\"}[5m]))",
           "format": "time_series",
           "interval": "",
-          "legendFormat": "{{class}}",
+          "legendFormat": "{{class}} ({{status}})",
           "refId": "A"
         }
       ],
