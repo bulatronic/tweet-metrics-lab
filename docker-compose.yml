@@ -35,11 +35,17 @@ services:
             - APP_ENV=dev
             - APP_DEBUG=1
         command: [ "php", "bin/console", "app:outbox:relay" ]
+        # The image healthcheck curls Caddy's admin port, which CLI workers do not run.
+        # Liveness here is handled by restart: unless-stopped.
+        healthcheck:
+            test: [ "NONE" ]
         networks:
             - tweet-network
         depends_on:
-            - database
-            - rabbitmq
+            database:
+                condition: service_started
+            rabbitmq:
+                condition: service_healthy
 
     # Обрабатывает async-очередь (feed projection, counters, search, …)
     messenger-worker:
@@ -60,13 +66,21 @@ services:
             - async
             - --memory-limit=256M
             - -vv
+        # The image healthcheck curls Caddy's admin port, which CLI workers do not run.
+        # Liveness here is handled by restart: unless-stopped.
+        healthcheck:
+            test: [ "NONE" ]
         networks:
             - tweet-network
         depends_on:
-            - database
-            - redis
-            - rabbitmq
-            - elasticsearch
+            database:
+                condition: service_started
+            redis:
+                condition: service_started
+            rabbitmq:
+                condition: service_healthy
+            elasticsearch:
+                condition: service_started
 
     database:
         image: postgres:18-alpine
@@ -109,6 +123,12 @@ services:
         volumes:
             - rabbitmq-data:/var/lib/rabbitmq
             - ./docker/rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins:ro
+        healthcheck:
+            test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
+            interval: 10s
+            timeout: 5s
+            retries: 10
+            start_period: 30s
         networks:
             - tweet-network
 

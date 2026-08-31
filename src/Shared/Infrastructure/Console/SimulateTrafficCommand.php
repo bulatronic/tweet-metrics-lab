@@ -112,18 +112,17 @@ final class SimulateTrafficCommand extends Command
             if (null !== $spikeUntil && $now >= $spikeUntil) {
                 $spikeUntil = null;
                 $nextSpikeAt = $now + random_int(self::SPIKE_INTERVAL_MIN_SECONDS, self::SPIKE_INTERVAL_MAX_SECONDS);
-                'H:i:s'
-                    |> date(...)
-                    |> (fn ($x) => sprintf('<comment>[%s] spike ended → RPS=%d</comment>', $x, $baseRps))
-                    |> $io(...);
+                $io->writeln(sprintf('<comment>[%s] spike ended → RPS=%d</comment>', date('H:i:s'), $baseRps));
             }
 
             if (null === $spikeUntil && $now >= $nextSpikeAt) {
                 $spikeUntil = $now + self::SPIKE_DURATION_SECONDS;
-                'H:i:s'
-                    |> date(...)
-                    |> (fn ($x) => sprintf('<info>[%s] SPIKE → RPS=%d for %ds</info>', $x, $baseRps * self::SPIKE_MULTIPLIER, self::SPIKE_DURATION_SECONDS))
-                    |> $io(...);
+                $io->writeln(sprintf(
+                    '<info>[%s] SPIKE → RPS=%d for %ds</info>',
+                    date('H:i:s'),
+                    $baseRps * self::SPIKE_MULTIPLIER,
+                    self::SPIKE_DURATION_SECONDS,
+                ));
             }
 
             $effectiveRps = null !== $spikeUntil

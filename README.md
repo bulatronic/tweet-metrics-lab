@@ -21,6 +21,11 @@
 Transactional Outbox**: модули по агрегатам, чистый Domain, Application
 (command/query handlers), Infrastructure (API, Doctrine, Messenger).
 
+![Дашборд Symfony Application Overview в Grafana под нагрузкой k6](docs/images/grafana.png)
+
+Дашборд `Symfony Application Overview` под нагрузкой k6: 50 VU, 59 RPS,
+p95 41 мс, ноль ответов 5xx. Как повторить - в разделе [Нагрузка](#нагрузка).
+
 ## Стек
 
 | Слой          | Технологии                                                             |
